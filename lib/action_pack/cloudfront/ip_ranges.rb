@@ -30,7 +30,7 @@ module ActionPack
       end
 
       def aws_proxies
-        ip_ranges.map(&:ipaddr)
+        ip_ranges.map(&:ipaddr).uniq
       end
 
       def ip_ranges
