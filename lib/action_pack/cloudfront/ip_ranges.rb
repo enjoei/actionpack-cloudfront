@@ -11,13 +11,13 @@ module ActionPack
           @region = attrs['region']
         end
 
+        def cloudfront?
+          service =~ /cloudfront/i
+        end
+
         def ipaddr
           IPAddr.new(ip_prefix)
         end
-      end
-
-      def cloudfront?
-        service =~ /cloudfront/i
       end
 
       def trusted_proxies
