@@ -3,9 +3,10 @@ module ActionPack
     module IpRanges
 
       class Range
-        attr_reader :ip_prefix, :region
+        attr_reader :ip_prefix, :region, :service
 
         def initialize(attrs)
+          @service = attrs['service']
           @ip_prefix = attrs['ip_prefix'] || attrs['ipv6_prefix']
           @region = attrs['region']
         end
@@ -15,8 +16,12 @@ module ActionPack
         end
       end
 
+      def cloudfront?
+        service =~ /cloudfront/i
+      end
+
       def trusted_proxies
-        incapsula_proxies + aws_proxies + ActionDispatch::RemoteIp::TRUSTED_PROXIES
+        incapsula_proxies + cloudfront_proxies + ActionDispatch::RemoteIp::TRUSTED_PROXIES
       end
 
       def incapsula_proxies
@@ -29,8 +34,8 @@ module ActionPack
         proxies.map { |ip_prefix| IPAddr.new(ip_prefix) }
       end
 
-      def aws_proxies
-        ip_ranges.map(&:ipaddr).uniq
+      def cloudfront_proxies
+        ip_ranges.select(&:cloudfront?).map(&:ipaddr)
       end
 
       def ip_ranges
